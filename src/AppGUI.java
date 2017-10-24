@@ -3,10 +3,11 @@ import java.util.Scanner;
 public class AppGUI
 {
 	private Scanner keyboard = new Scanner(System.in);
+	private Board board;
 	
 	public AppGUI()
 	{
-		Board board = new Board();
+		board = new Board("./ThreeStonesBoard.csv");
 		
 		String startORquit = promptString("Type start to start the game and quit to quit the game", new String[]{"start", "quit"}, "Try again and please enter start or quit");
 		
@@ -23,7 +24,7 @@ public class AppGUI
 				int x = position[0];
 				int y = position[1] - 1;
 				
-				board.placeStone(x, y, "x");
+				board.placeStone(x, y, "w");
 				board.draw();
 			}
 		}
@@ -40,9 +41,9 @@ public class AppGUI
 		int x = position[0];
 		int y = position[1];
 		
-		while(x > 11 || x < 1 || y > 11 || y < 1)
+		while(!board.isValidMove(x, y))
 		{
-			println("x and y must be between 1 and 11 inclusive. Please try again.");
+			println("("+x+","+y+") is not a valid position. Please try again.");
 			
 			position = promptForPosition();
 			x = position[0];
