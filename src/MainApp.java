@@ -23,93 +23,60 @@ public class MainApp
 		System.out.println("Please enter an IP address: ");
 		serverAddress = clientInput.nextLine();
 		
-		while (!isValid) {
+		while (!isValid)
+		{
 			System.out.println("Please enter a PORT number: ");
 			port = clientInput.nextLine();
 			isValid = inputValidation(port);
 		} 
-		
-		clientInput.close();
-		
-		
+
 		//Establishing a connection.
 		try (Socket clientSocket = new Socket(serverAddress, Integer.valueOf(port))){
 			
 			InputStream in =  clientSocket.getInputStream();
 			OutputStream out = clientSocket.getOutputStream();
-			byte[] respondPacket;
-			byte[] byteRecv;
+			byte[] sendPacket = null;
+			byte[] receivePacket;
 			
 			
-			respondPacket = new byte[1];
-			respondPacket[0] = (byte) 0;
-			out.write(respondPacket);
+			sendPacket = new byte[1];
+			sendPacket[0] = (byte) 0;
+			out.write(sendPacket);
 			
-			byteRecv = new byte[7];
-			in.read(byteRecv);
+			receivePacket = new byte[7];
+			in.read(receivePacket);
 			
-			System.out.println("Byte recieved: " + byteRecv[0]); 
+			System.out.println("Byte received: " + receivePacket[0]); 
 			
-			switch (byteRecv[0]) {
+			switch (receivePacket[0]) 
+			{
 				case 0:
-//					respondPacket = new byte[3];
-//					respondPacket[0] = (byte) 1;
-//					respondPacket[1] = (byte) 5;
-//					respondPacket[2] = (byte) 6;
-					
-					respondPacket = new byte[1];
-					respondPacket[0] = (byte) 9;
-					
-					
-					out.write(respondPacket);
-					
-					
-					
-					//AppGUI gui = new AppGUI();
-					
-					
-				case 9:
-					
-					
-					
-					respondPacket = new byte[1];
-					respondPacket[0] = (byte) 9;
-					
-					out.write(respondPacket);
-					
-					System.out.println("Hey babe");
-					
-					
-					
-					
-					
+					AppGUI gui = new AppGUI();
+					break;
+				
 			} // switch close
-			
-			
-			
-			
-			
-			
-			
-			
-		} catch (NumberFormatException e) {
+		} 
+		catch (NumberFormatException e) 
+		{
 			e.printStackTrace();
-		} catch (UnknownHostException e) {
+		} 
+		catch (UnknownHostException e) 
+		{
 			e.printStackTrace();
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			e.printStackTrace();
 		}
-
 		
-		
+		clientInput.close();
 	} // end of main
 	
 	
 	//Validation for the port number, to check if it is a numeric input.
-	public static boolean inputValidation(String port) {
-		
-		  return port.matches("[0-9]+");
-		
+	public static boolean inputValidation(String port) 
+	{	
+		return port.matches("[0-9]+");
 	}
 	
 	

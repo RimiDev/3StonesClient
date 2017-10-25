@@ -51,32 +51,18 @@ public class AppGUI
 		
 		while(!board.isValidMove(x, y))
 		{
-			println("("+x+","+y+") is not a valid position. Please try again.");
+			System.out.println("("+x+","+y+") is not a valid position. Please try again.");
 			
 			position = promptForPosition();
 			x = position[0];
 			y = position[1];
 		}
-		
-		String yesORno = promptString("You chose ["+ x + "," + y + "], correct? (yes or no)", new String[]{"yes", "no"}, "Try again and please enter yes or no.");
-		
-		while(yesORno.equalsIgnoreCase("no"))
-		{
-			println("...CORRECTING PREVIOUS CHOICE...");
-			
-			position = promptForPosition();
-			x = position[0];
-			y = position[1];
-			
-			yesORno = promptString("You chose ["+ x + "," + y + "], correct? (yes or no)", new String[]{"yes", "no"}, "Try again and please enter yes or no.");
-		}
-		
 		return position;
 	}
 	
 	private int[] promptForPosition()
 	{
-		println("Enter the position you wish to play.");
+		System.out.println("Enter the position you wish to play.");
 		
 		int x = promptInt("x: ", "Invalid x position. Please try again.", false);
 		
@@ -100,15 +86,6 @@ public class AppGUI
 		}
 	}
 	
-	private void print(String message)
-	{
-		System.out.print(message);
-	}
-	
-	private void println(String message)
-	{
-		System.out.println(message);
-	}
 	
 	private String promptString(String message, String[] validValues, String invalidInputMessage) throws IOException 
 	{
