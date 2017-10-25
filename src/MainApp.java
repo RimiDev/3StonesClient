@@ -83,7 +83,8 @@ public class MainApp
 					int serverScore = receivePacket[5];
 					int clientScore = receivePacket[6];
 					String gameOver = String.valueOf(receivePacket[7]);
-					
+					gui.setStone(clientX, clientY, "w");
+					gui.setStone(serverX, serverY, "b");
 					sendPacket = new byte[1];
 					sendPacket[0] = (byte)1;
 					
@@ -99,6 +100,19 @@ public class MainApp
 					System.out.println("user pos" + userPos[0] + "  ||  " +  userPos[1]);
 					
 					System.out.println("cx: " + clientX + " cy: " + clientY + " sX: " + serverX + " sY: " + serverY + " ss: " + serverScore + " cs: " + clientScore + " GO: " + gameOver);
+					break;
+					
+				case 2:
+					System.out.println("Invalid stone placement, wtf you do ? ? ? ? ?");
+					
+					userPos = gui.getUserPosition();
+					
+					sendPacket = new byte[3];
+					sendPacket[0] = (byte) 1;
+					sendPacket[1] = (byte) (userPos[0]);
+					sendPacket[2] = (byte) (userPos[1]);
+					
+					out.write(sendPacket);
 					
 					
 			} // switch close

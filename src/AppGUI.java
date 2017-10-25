@@ -135,7 +135,10 @@ public class AppGUI
 	
 	public void setStone(int x, int y, String tile)
 	{
-		board.placeStone(x, y, "w");
+		board.placeStone(x, y, tile);
+		
+		System.out.println("\n \n");
+		
 		board.draw();
 	}
 	
