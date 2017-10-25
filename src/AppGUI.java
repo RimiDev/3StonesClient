@@ -1,13 +1,21 @@
 import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class AppGUI
 {
+	
+	//TRY
+	java.io.BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+	
 	private Scanner keyboard = new Scanner(System.in);
 	private Board board;
 	
-	public AppGUI()
+	public AppGUI() throws IOException
 	{
 		board = new Board("./ThreeStonesBoard.csv");
+		
 		
 		String startORquit = promptString("Type start to start the game and quit to quit the game", new String[]{"start", "quit"}, "Try again and please enter start or quit");
 		
@@ -34,7 +42,7 @@ public class AppGUI
 		}
 	}
 	
-	private int[] getUserPosition()
+	private int[] getUserPosition() throws IOException
 	{
 		int[] position = promptForPosition();
 		
@@ -102,11 +110,11 @@ public class AppGUI
 		System.out.println(message);
 	}
 	
-	private String promptString(String message, String[] validValues, String invalidInputMessage)
+	private String promptString(String message, String[] validValues, String invalidInputMessage) throws IOException 
 	{
 		System.out.println(message);
 		
-		String input = keyboard.nextLine();
+		String input = in.readLine();
 
 		boolean valid = false;
 	
