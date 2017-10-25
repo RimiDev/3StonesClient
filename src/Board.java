@@ -23,7 +23,8 @@ public class Board
         	String line = "";
             Scanner scanner = new Scanner(file);
             
-            int row = 1;
+            //IF THERES A BUG LOOK HERE
+            int row = 0;
             
             while(scanner.hasNextLine())
             {
@@ -73,13 +74,13 @@ public class Board
 	
 	public void draw()
 	{
-		String[] yIndexes = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"};
+		String[] yIndexes = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 		
 		ColumnFormatter<String> ageFormatter = ColumnFormatter.text(Alignment.CENTER, 3);
 
 		Table.Builder builder = new Table.Builder("", yIndexes, ageFormatter);
 		
-		for(int i = 1; i <= 11; i++)
+		for(int i = 0; i < 11; i++)
 			builder.addColumn(""+i, columns.get(i), ageFormatter);
 
 		Table table = builder.build();
@@ -88,27 +89,30 @@ public class Board
 	
 	public boolean isValidMove(int x, int y)
 	{
+		// IF THERES A BUG LOOK HERE
+		
 		// If first 2 rows or last 2 rows
-		if(y == 1 || y == 2 || y == 10 || y == 11)
+		if(y == 0 || y == 1 || y == 9 || y == 10)
 			return false;
 		
 		// If first 2 columns or last 2 columns
-		if(x == 1 || x == 2 || x == 10 || x == 11)
+		if(x == 0 || x == 1 || x == 9 || x == 10)
 			return false;
 		
-		if((y == 3 || y == 9) && (x < 5 || x > 7))
+		if((y == 2 || y == 8) && (x < 4 || x > 6))
 			return false;
 		
-		if((x == 3 || x == 9) && (y == 4 || y == 8))
+		if((x == 2 || x == 8) && (y == 3 || y == 7))
 			return false;
 		
 		// If in middle
-		if(x == 6 && y == 6)
+		if(x == 5 && y == 5)
 			return false;
 		
 		return true;
 	}
 	
+	//REMOVE IF NOT USED
 	public boolean isEmpty(int x, int y)
 	{
 		//TODO

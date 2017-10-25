@@ -11,9 +11,15 @@ public class MainApp
 {	
 	
 	static boolean isValid = false;
+	static boolean gameOver = false;
+	static boolean firstEntry = true;
 	
-	public static void main(String[] args)
-	{					
+	
+	public static void main(String[] args) throws NumberFormatException, UnknownHostException, IOException
+	{			
+		int[] userPos = null;
+		Board board = null;
+		AppGUI gui = null;
 		//Scanner object
 		Scanner clientInput = new Scanner(System.in);
 		
@@ -23,82 +29,96 @@ public class MainApp
 		System.out.println("Please enter an IP address: ");
 		serverAddress = clientInput.nextLine();
 		
-		while (!isValid) {
+		while (!isValid)
+		{
 			System.out.println("Please enter a PORT number: ");
 			port = clientInput.nextLine();
 			isValid = inputValidation(port);
 		} 
-		
-		clientInput.close();
-		
-		
+
+		Socket clientSocket = new Socket(serverAddress, Integer.valueOf(port));
+	while (!gameOver){
 		//Establishing a connection.
-		try (Socket clientSocket = new Socket(serverAddress, Integer.valueOf(port))){
+		try {			
 			
 			InputStream in =  clientSocket.getInputStream();
 			OutputStream out = clientSocket.getOutputStream();
-			byte[] respondPacket;
-			byte[] byteRecv;
+			byte[] sendPacket = null;
+			byte[] receivePacket;
 			
 			
-			respondPacket = new byte[1];
-			respondPacket[0] = (byte) 0;
-			out.write(respondPacket);
+			if (firstEntry) {
+			sendPacket = new byte[1];
+			sendPacket[0] = (byte) 0;
+			out.write(sendPacket);
+			firstEntry = false;
+			} 
 			
-			byteRecv = new byte[7];
-			in.read(byteRecv);
 			
-			System.out.println("Byte recieved: " + byteRecv[0]); 
+			receivePacket = new byte[8];
+			in.read(receivePacket);
+			System.out.println("Byte received: " + receivePacket[0]); 
 			
-			switch (byteRecv[0]) {
+			switch (receivePacket[0]) 
+			{
 				case 0:
-//					respondPacket = new byte[3];
-//					respondPacket[0] = (byte) 1;
-//					respondPacket[1] = (byte) 5;
-//					respondPacket[2] = (byte) 6;
+					gui = new AppGUI();
+					userPos = gui.getUserPosition();
 					
-					respondPacket = new byte[1];
-					respondPacket[0] = (byte) 9;
+					sendPacket = new byte[3];
+					sendPacket[0] = (byte) 1;
+					sendPacket[1] = (byte) (userPos[0]);
+					sendPacket[2] = (byte) (userPos[1]);
 					
+					out.write(sendPacket);
 					
-					out.write(respondPacket);
+					System.out.println("user pos" + userPos[0] + "  ||  " +  userPos[1]);
+					break;
+				case 1:
 					
+					int clientX = receivePacket[1];
+					int clientY = receivePacket[2];
+					int serverX = receivePacket[3];
+					int serverY = receivePacket[4];
+					int serverScore = receivePacket[5];
+					int clientScore = receivePacket[6];
+					String gameOver = String.valueOf(receivePacket[7]);
 					
+					sendPacket = new byte[1];
+					sendPacket[0] = (byte)1;
 					
-					//AppGUI gui = new AppGUI();
+					userPos = gui.getUserPosition();
 					
+					sendPacket = new byte[3];
+					sendPacket[0] = (byte) 1;
+					sendPacket[1] = (byte) (userPos[0]);
+					sendPacket[2] = (byte) (userPos[1]);
 					
-				case 9:
+					out.write(sendPacket);
 					
+					System.out.println("user pos" + userPos[0] + "  ||  " +  userPos[1]);
 					
-					
-					respondPacket = new byte[1];
-					respondPacket[0] = (byte) 9;
-					
-					out.write(respondPacket);
-					
-					System.out.println("Hey babe");
-					
-					
-					
+					System.out.println("cx: " + clientX + " cy: " + clientY + " sX: " + serverX + " sY: " + serverY + " ss: " + serverScore + " cs: " + clientScore + " GO: " + gameOver);
 					
 					
 			} // switch close
 			
-			
-			
-			
-			
-			
-			
-			
-		} catch (NumberFormatException e) {
+		} // try
+		
+		catch (NumberFormatException e) 
+		{
 			e.printStackTrace();
-		} catch (UnknownHostException e) {
+		} 
+		catch (UnknownHostException e) 
+		{
 			e.printStackTrace();
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			e.printStackTrace();
 		}
+		
+	} // end of gameOver loop
 
 		
 		
@@ -106,10 +126,9 @@ public class MainApp
 	
 	
 	//Validation for the port number, to check if it is a numeric input.
-	public static boolean inputValidation(String port) {
-		
-		  return port.matches("[0-9]+");
-		
+	public static boolean inputValidation(String port) 
+	{	
+		return port.matches("[0-9]+");
 	}
 	
 	
