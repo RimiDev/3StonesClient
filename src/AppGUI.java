@@ -6,8 +6,6 @@ import java.io.InputStreamReader;
 public class AppGUI
 {
 	
-	//TRY
-	java.io.BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 	
 	private Scanner keyboard = new Scanner(System.in);
 	private Board board;
@@ -25,16 +23,16 @@ public class AppGUI
 			
 			board.draw();
 			
-			while(true)
-			{
-				int[] position = getUserPosition();
-				
-				int x = position[0];
-				int y = position[1] - 1;
-				
-				board.placeStone(x, y, "w");
-				board.draw();
-			}
+//			while(true)
+//			{
+//				int[] position = getUserPosition();
+//				
+//				int x = position[0];
+//				int y = position[1];
+//				
+//				board.placeStone(x, y, "w");
+//				board.draw();
+//			}
 		}
 		else if(startORquit.equalsIgnoreCase("quit"))
 		{
@@ -42,7 +40,7 @@ public class AppGUI
 		}
 	}
 	
-	private int[] getUserPosition() throws IOException
+	public int[] getUserPosition() throws IOException
 	{
 		int[] position = promptForPosition();
 		
@@ -57,10 +55,14 @@ public class AppGUI
 			x = position[0];
 			y = position[1];
 		}
+<<<<<<< HEAD
+=======
+		
+>>>>>>> b9ca7ac81ddb404d2e8cf97a7d584693b46f8874
 		return position;
 	}
 	
-	private int[] promptForPosition()
+	public int[] promptForPosition()
 	{
 		System.out.println("Enter the position you wish to play.");
 		
@@ -73,7 +75,7 @@ public class AppGUI
 		return pos;
 	}
 	
-	private boolean isInteger(String value)
+	public boolean isInteger(String value)
 	{
 		try
 		{
@@ -87,11 +89,11 @@ public class AppGUI
 	}
 	
 	
-	private String promptString(String message, String[] validValues, String invalidInputMessage) throws IOException 
+	public String promptString(String message, String[] validValues, String invalidInputMessage) throws IOException 
 	{
 		System.out.println(message);
 		
-		String input = in.readLine();
+		String input = keyboard.nextLine();
 
 		boolean valid = false;
 	
@@ -116,7 +118,7 @@ public class AppGUI
 		return input;
 	}
 	
-	private int promptInt(String message, String invalidInputMessage, boolean newLine)
+	public int promptInt(String message, String invalidInputMessage, boolean newLine)
 	{
 		if(newLine)
 			System.out.println(message);
@@ -133,4 +135,14 @@ public class AppGUI
 		
 		return Integer.parseInt(input);
 	}
+	
+	public void setStone(int x, int y, String tile)
+	{
+		board.placeStone(x, y, tile);
+		
+		System.out.println("\n \n");
+		
+		board.draw();
+	}
+	
 }
