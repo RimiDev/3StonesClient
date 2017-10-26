@@ -137,4 +137,9 @@ public class ThreeStonesClientInterface
 		board.draw();
 	}
 	
+	public Board getBoard()
+	{
+		return board;
+	}
+	
 }

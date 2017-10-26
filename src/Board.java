@@ -12,6 +12,9 @@ public class Board
 {
 	private List<String[]> columns = new ArrayList<String[]>();
 	
+	private int lastPlayX = -1;
+	private int lastPlayY = -1;
+	
 	public Board(String fileName)
 	{
 		resetBoard();
@@ -36,8 +39,8 @@ public class Board
             	{
             		String stone = "";
             		
-            		if("n".equals(cols[col]))
-            			stone = "#";
+            		if("e".equals(cols[col]))
+            			stone = "-";
 
             		placeStone(row, col, stone);
             	}
@@ -70,6 +73,20 @@ public class Board
 	public void placeStone(int x, int y, String tmpPlayerType)
 	{
 		columns.get(x)[y] = tmpPlayerType;
+	}
+	
+	public void removeLastMove()
+	{
+		if(lastPlayX == -1 && lastPlayY == -1)
+			return;
+
+		columns.get(lastPlayX)[lastPlayY] = "B";
+	}
+	
+	public void setNewMove(int moveX, int moveY)
+	{
+		lastPlayX = moveX;
+		lastPlayY = moveY;
 	}
 	
 	public void draw()

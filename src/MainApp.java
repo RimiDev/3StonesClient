@@ -98,11 +98,16 @@ public class MainApp
 					int clientScore = receivePacket[5];
 					int serverScore = receivePacket[6];
 					char gameStatus = (char)receivePacket[7];
+							
+					threeStonesGame.getBoard().removeLastMove();
 					
 					// Sets the moves of the client and server onto the client's board, according to the positions of the receive packet.
 					// "w" represents white stone, "b" represents black stone.
-					threeStonesGame.setStone(clientPositionX, clientPositionY, "w");
-					threeStonesGame.setStone(serverPositionX, serverPositionY, "b");
+					threeStonesGame.setStone(clientPositionX, clientPositionY, "W");
+					threeStonesGame.setStone(serverPositionX, serverPositionY, "[B]");
+					
+					threeStonesGame.getBoard().setNewMove(serverPositionX, serverPositionY);
+	
 					System.out.println("Client's score: " + clientScore + "\tServer's score: " + serverScore);
 					
 					if(gameStatus == 'B')
