@@ -89,7 +89,9 @@ public class Board
 	
 	public boolean isValidMove(int x, int y)
 	{
-		// IF THERES A BUG LOOK HERE
+		// If outside of range
+		if(x < 0 || x > 10 || y < 0 || y > 10)
+			return false;
 		
 		// If first 2 rows or last 2 rows
 		if(y == 0 || y == 1 || y == 9 || y == 10)
@@ -110,12 +112,5 @@ public class Board
 			return false;
 		
 		return true;
-	}
-	
-	//REMOVE IF NOT USED
-	public boolean isEmpty(int x, int y)
-	{
-		//TODO
-		return false;
 	}
 }

@@ -3,14 +3,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class AppGUI
+public class ThreeStonesClientInterface
 {
 	
 	
 	private Scanner keyboard = new Scanner(System.in);
 	private Board board;
 	
-	public AppGUI() throws IOException
+	public ThreeStonesClientInterface() throws IOException
 	{
 		board = new Board("./ThreeStonesBoard.csv");
 		
@@ -22,17 +22,6 @@ public class AppGUI
 			System.out.println("...STARTING GAME...");
 			
 			board.draw();
-			
-//			while(true)
-//			{
-//				int[] position = getUserPosition();
-//				
-//				int x = position[0];
-//				int y = position[1];
-//				
-//				board.placeStone(x, y, "w");
-//				board.draw();
-//			}
 		}
 		else if(startORquit.equalsIgnoreCase("quit"))
 		{
@@ -40,25 +29,28 @@ public class AppGUI
 		}
 	}
 	
-	public int[] getUserPosition() throws IOException
+	/**
+	 * Asks the user to enter an x and y values to be placed on the board.
+	 * @return
+	 * @throws IOException
+	 */
+	public int[] promptClientMove() throws IOException
 	{
-		int[] position = promptForPosition();
-		
-		int x = position[0];
-		int y = position[1];
-		
+		int x = -1;
+		int y = -1;
+		int[] position = new int[] {x, y};
 		while(!board.isValidMove(x, y))
 		{
-			System.out.println("("+x+","+y+") is not a valid position. Please try again.");
+			System.out.println("Enter a valid position you wish to play.");
 			
-			position = promptForPosition();
+			x = promptInt("x: ", "Invalid x position. Please try again.", false);
+			y = promptInt("y: ", "Invalid y position. Please try again.", false);
+			
+			position = new int[] {x, y};
 			x = position[0];
 			y = position[1];
 		}
-<<<<<<< HEAD
-=======
 		
->>>>>>> b9ca7ac81ddb404d2e8cf97a7d584693b46f8874
 		return position;
 	}
 	

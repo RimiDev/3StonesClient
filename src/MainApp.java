@@ -5,139 +5,162 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-
-
 public class MainApp
 {
-
-	static boolean isValid = false;
-	static boolean gameOver = false;
-	static boolean firstEntry = true;
-
-
-	public static void main(String[] args) throws NumberFormatException, UnknownHostException, IOException
+	public static void main(String[] args) throws IOException
 	{
-		int[] userPos = null;
-		Board board = null;
-		AppGUI gui = null;
-		//Scanner object
+		// Indicators that check if the entered port number is valid; 
+		// if the Three Stones game is over;
+		// if the user has just started the game and is about to make the first move.
+		boolean validPortNumber = false;
+		boolean gameOver = false;
+		boolean firstEntry = true;
+		
+		// Holds the user's current desired X,Y position on the Three Stones game board to set a stone on.
+		int[] userMove = null;
+		
+		// Scanner that will be used for user input
 		Scanner clientInput = new Scanner(System.in);
+		
+		// Controls the user interface of the client
+		ThreeStonesClientInterface threeStonesGame = null;
 
+		// Variables that hold the IP address of the server as well as the port being used
 		String serverAddress;
 		String port = "";
 
+		// Prompts the user to enter the server's IP address
 		System.out.println("Please enter an IP address: ");
 		serverAddress = clientInput.nextLine();
 
-		while (!isValid)
+		// Prompts the user to enter the port number that the server is using.
+		// Will keep prompting the user until the user enters a numeric value that can be parsed into a int.
+		while (!validPortNumber)
 		{
-			System.out.println("Please enter a PORT number: ");
+			System.out.println("Please enter port number: ");
 			port = clientInput.nextLine();
-			isValid = inputValidation(port);
+			validPortNumber = inputValidation(port);
 		}
-
+		
+		// Creating a Socket with the server's IP address and port number.
 		Socket clientSocket = new Socket(serverAddress, Integer.valueOf(port));
-	while (!gameOver){
-		//Establishing a connection.
-		try {
-
+		
+		// While the game is not over, keep playing.
+		while (!gameOver)
+		{
+			// Creating InputStream and OutputStream
 			InputStream in =  clientSocket.getInputStream();
 			OutputStream out = clientSocket.getOutputStream();
+			
+			// byte arrays that will be used as send and receive packets
 			byte[] sendPacket = null;
 			byte[] receivePacket;
 
-
-			if (firstEntry) {
-			sendPacket = new byte[1];
-			sendPacket[0] = (byte) 0;
-			out.write(sendPacket);
-			firstEntry = false;
+			if (firstEntry) 
+			{
+				sendPacket = new byte[1];
+				sendPacket[0] = (byte) 0;
+				out.write(sendPacket);
+				firstEntry = false;
 			}
-
-
+			
 			receivePacket = new byte[8];
 			in.read(receivePacket);
 			System.out.println("Byte received: " + receivePacket[0]);
 
 			switch (receivePacket[0])
 			{
+				// If the first byte is a 0, then the server has acknowledged the request for a game.
+				// The client will then send back a packet to the server with his X,Y move.
+				// The server will then make sure that the place the client wants to place a stone on is empty.
 				case 0:
-					gui = new AppGUI();
-					userPos = gui.getUserPosition();
-
+					threeStonesGame = new ThreeStonesClientInterface();
+					
+					// Make a move and send to server
+					userMove = threeStonesGame.promptClientMove();
 					sendPacket = new byte[3];
 					sendPacket[0] = (byte) 1;
-					sendPacket[1] = (byte) (userPos[0]);
-					sendPacket[2] = (byte) (userPos[1]);
-
+					sendPacket[1] = (byte) (userMove[0]);
+					sendPacket[2] = (byte) (userMove[1]);
 					out.write(sendPacket);
 
-					System.out.println("user pos" + userPos[0] + "  ||  " +  userPos[1]);
+					System.out.println("Sending to server user's move -->  x:" + userMove[0] + " , y:" +  userMove[1]);
 					break;
+					
+				// Receives the current state of the game from the server, then prompts the user to make a new move
 				case 1:
-
-					int clientX = receivePacket[1];
-					int clientY = receivePacket[2];
-					int serverX = receivePacket[3];
-					int serverY = receivePacket[4];
-					int serverScore = receivePacket[5];
-					int clientScore = receivePacket[6];
-					String gameOver = String.valueOf(receivePacket[7]);
-					gui.setStone(clientX, clientY, "w");
-					gui.setStone(serverX, serverY, "b");
-					sendPacket = new byte[1];
-					sendPacket[0] = (byte)1;
-
-					userPos = gui.getUserPosition();
-
-					sendPacket = new byte[3];
-					sendPacket[0] = (byte) 1;
-					sendPacket[1] = (byte) (userPos[0]);
-					sendPacket[2] = (byte) (userPos[1]);
-
-					out.write(sendPacket);
-
-					System.out.println("user pos" + userPos[0] + "  ||  " +  userPos[1]);
-
-					System.out.println("cx: " + clientX + " cy: " + clientY + " sX: " + serverX + " sY: " + serverY + " ss: " + serverScore + " cs: " + clientScore + " GO: " + gameOver);
+					// Packet that the client is receiving includes the positions of the client's and server's moves,
+					// the scores of the client and server, as well as a char that tells the client whether or not the game is over.
+					int clientPositionX = receivePacket[1];
+					int clientPositionY = receivePacket[2];
+					int serverPositionX = receivePacket[3];
+					int serverPositionY = receivePacket[4];
+					int clientScore = receivePacket[5];
+					int serverScore = receivePacket[6];
+					char gameStatus = (char)receivePacket[7];
+					
+					// Sets the moves of the client and server onto the client's board, according to the positions of the receive packet.
+					// "w" represents white stone, "b" represents black stone.
+					threeStonesGame.setStone(clientPositionX, clientPositionY, "w");
+					threeStonesGame.setStone(serverPositionX, serverPositionY, "b");
+					System.out.println("Client's score: " + clientScore + "\tServer's score: " + serverScore);
+					
+					if(gameStatus == 'B')
+					{
+						gameOver = true;
+					}
+					else if(gameStatus == 'A')
+					{
+						// Make a new move and send to server
+						userMove = threeStonesGame.promptClientMove();
+						sendPacket = new byte[3];
+						sendPacket[0] = (byte) 1;
+						sendPacket[1] = (byte) (userMove[0]);
+						sendPacket[2] = (byte) (userMove[1]);
+						out.write(sendPacket);
+	
+						System.out.println("Sending to server user's move -->  x:" + userMove[0] + " , y:" +  userMove[1]);
+					}
 					break;
-
+					
+				// Let's the client know that the place he wants to set a stone on is invalid.
 				case 2:
-					System.out.println("Invalid stone placement, wtf you do ? ? ? ? ?");
+					System.out.println("Can't place a stone on selected area. Try again.");
 
-					userPos = gui.getUserPosition();
+					userMove = threeStonesGame.promptClientMove();
 
+					// Make a new move and send to server
+					userMove = threeStonesGame.promptClientMove();
 					sendPacket = new byte[3];
 					sendPacket[0] = (byte) 1;
-					sendPacket[1] = (byte) (userPos[0]);
-					sendPacket[2] = (byte) (userPos[1]);
-
+					sendPacket[1] = (byte) (userMove[0]);
+					sendPacket[2] = (byte) (userMove[1]);
 					out.write(sendPacket);
-
-
-			} // switch close
-
-		} // try
-
-		catch (NumberFormatException e)
-		{
-			e.printStackTrace();
-		}
-		catch (UnknownHostException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-
-	} // end of gameOver loop
-
-
-
+			} // end of switch statement
+			
+			// Once the game is over, asks the user if he wants to play again
+			if(gameOver == true)
+			{
+				String playAgain = threeStonesGame.promptString("Game is now over, want to play again?", new String[] {"yes", "no"}, "Please enter yes or no");
+				if(playAgain == "yes")
+				{
+					gameOver = false;
+					firstEntry = true;
+				}
+				else if(playAgain == "no")
+				{
+					// Sends a 3 - Tells the server that the client doesn't want to play anymore
+					sendPacket = new byte[]{(byte)3};
+					out.write(sendPacket);
+				}
+			}
+		} // end of while loop
+		
+		// Closing both the Scanner and the Socket
 		clientInput.close();
-	} // end of main
+		clientSocket.close();
+		
+	} // end of main method
 
 
 	//Validation for the port number, to check if it is a numeric input.
@@ -145,7 +168,5 @@ public class MainApp
 	{
 		return port.matches("[0-9]+");
 	}
-
-
 
 } // end of class
