@@ -37,7 +37,7 @@ public class Board
             		String stone = "";
             		
             		if("n".equals(cols[col]))
-            			stone = "x";
+            			stone = "#";
 
             		placeStone(row, col, stone);
             	}

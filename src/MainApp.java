@@ -66,7 +66,7 @@ public class MainApp
 			
 			receivePacket = new byte[8];
 			in.read(receivePacket);
-			System.out.println("Byte received: " + receivePacket[0]);
+			System.out.println("Byte received from server: " + receivePacket[0]);
 
 			switch (receivePacket[0])
 			{
@@ -142,16 +142,26 @@ public class MainApp
 			if(gameOver == true)
 			{
 				String playAgain = threeStonesGame.promptString("Game is now over, want to play again?", new String[] {"yes", "no"}, "Please enter yes or no");
-				if(playAgain == "yes")
+
+				if(playAgain.equals("yes"))
 				{
 					gameOver = false;
 					firstEntry = true;
-				}
-				else if(playAgain == "no")
-				{
-					// Sends a 3 - Tells the server that the client doesn't want to play anymore
-					sendPacket = new byte[]{(byte)3};
+					// Sends a 3 - Sends a packet to the server saying if user wants to play again
+					sendPacket = new byte[2];
+					sendPacket[0] = (byte) 3;
+					sendPacket[1] = (byte) 'A';
 					out.write(sendPacket);
+					System.out.println("Telling server to play again...");
+				}
+				else if(playAgain.equals("no"))
+				{
+					// Sends a 3 - Sends a packet to the server saying if user wants to play again
+					sendPacket = new byte[2];
+					sendPacket[0] = (byte) 3;
+					sendPacket[1] = (byte) 'B';
+					out.write(sendPacket);
+					System.out.println("Exiting the game...");
 				}
 			}
 		} // end of while loop
@@ -161,7 +171,6 @@ public class MainApp
 		clientSocket.close();
 		
 	} // end of main method
-
 
 	//Validation for the port number, to check if it is a numeric input.
 	public static boolean inputValidation(String port)
